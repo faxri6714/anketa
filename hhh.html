@@ -1,0 +1,242 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Secure Terminal</title>
+
+<style>
+body {
+    margin: 0;
+    background: rgb(255, 255, 255);
+    color: #000000;
+    font-family: monospace;
+    overflow: hidden;
+    font-size: 30px;
+}
+
+/* Форма */
+#form {
+    width: 60%;
+    height: 30%;
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border: 1px solid #000000;
+    padding: 20px;
+    font-size: 50px;
+}
+
+input {
+    font-size: 25px;
+    width: 68%;
+    height: 15%;
+    display: block;
+    margin: 10px auto;
+    padding: 8px;
+    background: rgb(255, 255, 255);
+    border: 1px solid #000000;
+    color: #000000;
+    outline: none;
+}
+
+button {
+    margin: 16px;
+    font-size: 29px;
+    width: 68%;
+    height: 13%;
+    padding: 7px;
+    background: blue;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Терминал */
+#terminal {
+    display: none;
+    padding: 20px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#log {
+    white-space: pre-line;
+    font-size: 50px;
+}
+
+/* Прогресс */
+.bar {
+    width: 100%;
+    height: 50px;
+    border: 1px solid blue;
+    margin-top: 15px;
+}
+
+#progress {
+    width: 0%;
+    height: 50px;
+    background: blue;
+}
+
+/* Чёрный экран */
+#blackScreen {
+    display: none;
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    color:#00ff88;
+    padding:20px;
+}
+
+#finalText {
+    font-size: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ФОРМА -->
+<div id="form">
+    <h3>Анкета друзей</h3>
+    <input id="name" placeholder="Имя">
+    <input id="phone" placeholder="Номер телефона">
+    <button onclick="start()">Сохранить</button>
+</div>
+
+<!-- ТЕРМИНАЛ -->
+<div id="terminal">
+    <div id="log"></div>
+
+    <div class="bar">
+        <div id="progress"></div>
+    </div>
+</div>
+
+<!-- ЧЁРНЫЙ ЭКРАН -->
+<div id="blackScreen">
+    <div id="finalText"></div>
+</div>
+
+<script>
+
+function typeLine(text, delay, callback) {
+    let i = 0;
+    let log = document.getElementById("log");
+
+    let interval = setInterval(() => {
+        log.innerHTML += text[i];
+        i++;
+        if(i >= text.length){
+            clearInterval(interval);
+            log.innerHTML += "\n";
+            if(callback) callback();
+        }
+    }, delay);
+}
+
+function progressBar() {
+    let bar = document.getElementById("progress");
+    let width = 0;
+
+    let interval = setInterval(() => {
+        width += Math.random() * 6;
+        bar.style.width = width + "%";
+
+        if(width >= 100){
+            clearInterval(interval);
+        }
+    }, 200);
+}
+
+function shutdownSequence(name, phone) {
+
+    setTimeout(() => {
+
+        document.getElementById("terminal").style.display = "none";
+        document.getElementById("blackScreen").style.display = "block";
+
+        let text = document.getElementById("finalText");
+
+        let lines = [
+            "FINALIZING PROCESS...",
+            "SAVING USER DATA...",
+            "NAME: " + name,
+            "PHONE: " + phone,
+            "",
+            "UPLOAD COMPLETE",
+            "SYSTEM ERROR DETECTED",
+            "CRITICAL FAILURE",
+            "SHUTTING DOWN INTERFACE..."
+        ];
+
+        let i = 0;
+
+        function print() {
+            if(i < lines.length){
+                text.innerHTML += lines[i] + "<br>";
+                i++;
+                setTimeout(print, 700);
+            } else {
+                setTimeout(() => {
+                    document.body.style.background = "black";
+                    document.body.innerHTML = "";
+                }, 2000);
+            }
+        }
+
+        print();
+
+    }, 6000);
+}
+
+function start() {
+
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+
+    document.getElementById("form").style.display = "none";
+    document.getElementById("terminal").style.display = "block";
+
+    let lines = [
+        "[SYSTEM] Initializing secure connection...",
+        "[OK] Connection established",
+        "[SCAN] Extracting profile...",
+        "[ACCESS] Bypass security layer...",
+        "",
+        "USER DETECTED",
+        "NAME: " + name,
+        "PHONE: " + phone,
+        "",
+        "[UPLOAD] Sending data to server...",
+        "[WARNING] Firewall detected...",
+        "[BYPASS] Override successful...",
+        "[SUCCESS] Data stored"
+    ];
+
+    let i = 0;
+
+    function next() {
+        if(i < lines.length){
+            typeLine(lines[i], 25, () => {
+                i++;
+                setTimeout(next, 400);
+            });
+        }
+    }
+
+    next();
+    progressBar();
+
+    shutdownSequence(name, phone);
+}
+
+</script>
+
+</body>
+</html>
